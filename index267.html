@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- ซ่อนแถบ URL เมื่อกด Add to Home Screen บน iOS (Safari) -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Reward App">
+
+  <!-- ซ่อนแถบ URL เมื่อกด Add to Home Screen บน Android (Chrome) -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#fdf3d0">
+
+  <!-- Web App Manifest แบบฝังในไฟล์เดียวเพื่อให้รองรับโหมด Standalone เต็มจอ -->
+  <link rel="manifest" href='data:application/manifest+json,{"name":"Reward App","short_name":"Reward","display":"standalone","start_url":".","background_color":"#ffffff","theme_color":"#dc2626"}'>
+  <title>Reward Voucher Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+      color: #111111;
+    }
+
+    /* Mobile Frame Container */
+    .app-container {
+      width: 100%;
+      max-width: 430px;
+      background-color: #ffffff;
+      position: relative;
+      padding-bottom: 140px; /* เว้นที่ให้แถบด้านล่าง */
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.08);
+      overflow-x: hidden;
+    }
+
+    /* Top Banner Area */
+    .hero-banner {
+      position: relative;
+      height: 215px; /* ปรับความสูงแบนเนอร์ได้ตามต้องการ */
+      background-color: #f3f4f6;
+      overflow: hidden;
+    }
+
+     .banner-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* ให้รูปขยายเต็มกรอบพอดีโดยสัดส่วนไม่เพี้ยน */
+      object-position: center top; /* จัดตำแหน่งรูปให้ชิดขอบบนตรงกลาง */
+      display: block;
+    }
+
+    /* Back Button */
+    .back-btn {
+      position: absolute;
+      top: 52px;
+      left: 16px;
+      width: 38px;
+      height: 38px;
+      background-color: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      z-index: 10;
+      border: none;
+    }
+
+    .back-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: #111;
+      stroke-width: 2.2;
+    }
+
+    /* Left Logo Circle Placeholder */
+    .banner-left {
+      width: 46%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 15px;
+    }
+
+    .brand-circle {
+      width: 145px;
+      height: 145px;
+      border-radius: 50%;
+      background: #dc2626;
+      border: 6px solid #111;
+      box-shadow: inset 0 0 0 4px #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      text-align: center;
+      font-weight: 800;
+      padding: 10px;
+    }
+
+    .brand-circle span {
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* Right Red Booth Banner */
+    .banner-right {
+      width: 54%;
+      background: linear-gradient(180deg, #991b1b 0%, #dc2626 30%, #b91c1c 100%);
+      padding: 12px 14px 20px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      position: relative;
+      text-align: center;
+    }
+
+    .banner-date-top {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      font-size: 8px;
+      color: rgba(255, 255, 255, 0.85);
+      font-weight: 600;
+    }
+
+    .redeem-pill {
+      background: #ffffff;
+      color: #b91c1c;
+      border-radius: 30px;
+      padding: 3px 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 12px;
+      margin-bottom: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .redeem-pill .txt-sm {
+      font-size: 11px;
+      font-weight: 700;
+      color: #991b1b;
+    }
+
+    .redeem-pill .pts-num {
+      font-size: 24px;
+      font-weight: 800;
+      color: #dc2626;
+      line-height: 1;
+    }
+
+    .redeem-pill .pts-label {
+      font-size: 8px;
+      font-weight: 800;
+      line-height: 1.1;
+      text-align: left;
+      color: #111;
+    }
+
+    .voucher-subtitle {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      margin-bottom: 2px;
+    }
+
+    .voucher-amount {
+      font-size: 54px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    .voucher-amount span {
+      font-size: 26px;
+    }
+
+    /* Overlapping White & Pink Card Wrapper */
+    .card-section {
+      padding: 0 16px;
+      margin-top: -42px;
+      position: relative;
+      z-index: 5;
+    }
+
+    /* White Code Card */
+    .code-card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 28px 20px 26px;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      position: relative;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #dc2626;
+      padding: 4px;
+    }
+
+    .copy-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: #dc2626;
+    }
+
+    .voucher-code {
+      font-size: 21px;
+      font-weight: 800;
+      color: #111111;
+      letter-spacing: 0.4px;
+      margin: 22px 0 30px;
+    }
+
+    .mark-used-btn {
+      background-color: #e1252b;
+      color: #ffffff;
+      border: none;
+      border-radius: 30px;
+      padding: 13px 38px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      min-width: 185px;
+      box-shadow: 0 2px 6px rgba(225, 37, 43, 0.25);
+      transition: transform 0.1s ease;
+    }
+
+    .mark-used-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Pink Expiry Box */
+    .expiry-box {
+      background-color: #fce2e5;
+      border-radius: 0 0 12px 12px;
+      margin-top: -8px;
+      padding: 24px 16px 18px;
+      text-align: center;
+    }
+
+    .expiry-label {
+      font-size: 15px;
+      color: #a6363f;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .countdown-timer {
+      font-size: 31px;
+      font-weight: 800;
+      color: #b91c1c;
+      letter-spacing: 0.5px;
+    }
+
+    .staff-hint {
+      text-align: center;
+      font-size: 13.5px;
+      color: #71717a;
+      margin: 20px 0 24px;
+      font-weight: 400;
+    }
+
+    /* Details Content */
+    .content-section {
+      padding: 0 16px;
+    }
+
+    .promo-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #111111;
+      line-height: 1.35;
+      margin-bottom: 22px;
+    }
+
+    /* 2-Column Stats Row */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: none;
+      margin-bottom: 22px;
+      position: relative;
+    }
+
+    .stats-grid::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 4px;
+      bottom: 4px;
+      width: 1px;
+      background-color: #a1a1aa;
+    }
+
+    .stat-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 13.5px;
+      color: #27272a;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .stat-value {
+      font-size: 16.5px;
+      font-weight: 700;
+      color: #111111;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ticket-icon {
+      width: 22px;
+      height: 16px;
+      fill: #e1252b;
+    }
+
+    /* Description & T&C */
+    .desc-block {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #1f2937;
+    }
+
+    .desc-heading {
+      font-weight: 700;
+      color: #111111;
+      margin-bottom: 2px;
+    }
+
+    .divider-line {
+      height: 1px;
+      background-color: #3f3f46;
+      margin: 6px 0;
+    }
+
+    .tc-title {
+      font-weight: 700;
+      color: #111111;
+      margin-bottom: 4px;
+    }
+
+    .tc-title.underlined {
+      text-decoration: underline;
+      margin-top: 22px;
+    }
+
+    .tc-list {
+      list-style: none;
+    }
+
+    .tc-list li {
+      margin-bottom: 3px;
+    }
+
+    /* Fixed Bottom Bar */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 430px;
+      background: #ffffff;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+      padding: 16px 16px 24px;
+      z-index: 20;
+    }
+
+    .points-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .points-label {
+      font-size: 16px;
+      color: #52525b;
+      font-weight: 500;
+    }
+
+    .points-val-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .coin-icon {
+      width: 22px;
+      height: 22px;
+      background: radial-gradient(circle at 30% 30%, #fde047, #eab308);
+      border: 2px solid #fef08a;
+      outline: 1px solid #ca8a04;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      color: #854d0e;
+    }
+
+    .points-num {
+      font-size: 17px;
+      font-weight: 700;
+      color: #111111;
+    }
+
+    .bottom-cta-btn {
+      width: 100%;
+      background-color: #e1252b;
+      color: #ffffff;
+      border: none;
+      border-radius: 30px;
+      padding: 15px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    /* Toast Notification for Copy */
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(17, 17, 17, 0.85);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 100;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="toast" id="toast">Copied code to clipboard</div>
+
+  <div class="app-container">
+    <!-- Top Banner (สามารถเปลี่ยนเป็น <img> ของแบรนด์ตัวเองได้) -->
+    <div class="hero-banner">
+      <button class="back-btn" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+
+
+    <!-- Top Banner แบบใช้รูปภาพใบเดียวเต็มพื้นที่ -->
+    <div class="hero-banner">
+      <button class="back-btn" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <!-- เปลี่ยน banner.jpg เป็นชื่อไฟล์รูปภาพหรือลิงก์รูปภาพของคุณ -->
+      <img src="https://drive.google.com/thumbnail?id=1cFZz_if8uOqaeh0x9vAfQJ3-SfPKA9CL&sz=s4000" alt="Banner" class="banner-img">
+    </div>
+    </div>
+
+    <!-- Overlapping Code & Countdown Section -->
+    <div class="card-section">
+      <div class="code-card">
+        <button class="copy-btn" id="copyBtn" title="Copy Code">
+          <svg viewBox="0 0 24 24">
+            <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+          </svg>
+        </button>
+
+        <div class="voucher-code" id="voucherCode"> MK973991 </div>
+
+        <button class="mark-used-btn">Mark as used</button>
+      </div>
+
+      <div class="expiry-box">
+        <div class="expiry-label">This coupon will expire in</div>
+        <div class="countdown-timer" id="countdownDisplay">9999999 : 60</div>
+      </div>
+
+      <div class="staff-hint">Show the staff this code to use privilege</div>
+    </div>
+
+    <!-- Scrollable Content Details -->
+    <div class="content-section">
+      <h1 class="promo-title">Use 20 points get discount 100 THB at Suki Teenoi</h1>
+
+      <div class="stats-grid">
+        <div class="stat-col">
+          <span class="stat-label">Coupon remains</span>
+          <div class="stat-value">
+            <svg class="ticket-icon" viewBox="0 0 24 18">
+              <path d="M22 0H2C0.9 0 0 0.9 0 2V6C1.66 6 3 7.34 3 9C3 10.66 1.66 12 0 12V16C0 17.1 0.9 18 2 18H22C23.1 18 24 17.1 24 16V12C22.34 12 21 10.66 21 9C21 7.34 22.34 6 24 6V2C24 0.9 23.1 0 22 0ZM9 14H7V12H9V14ZM9 10H7V8H9V10ZM9 6H7V4H9V6Z"/>
+            </svg>
+            <span>135/1200</span>
+          </div>
+        </div>
+        <div class="stat-col">
+          <span class="stat-label">Coupon period</span>
+          <div class="stat-value">16 Sep - 31 Oct 2026</div>
+        </div>
+      </div>
+
+      <div class="desc-block">
+        <div class="desc-heading">Get free discount 100 THB at Suki Teenoi</div>
+        <div>Redeem 20 points to get free 100 THB at Suki Teenoi</div>
+        <div>Promotion Period: 16 Sep 2026 – 31 Oct 2026</div>
+        <div>Limited to 1 right/1 membership ID/campaign period, Limited privileges available</div>
+
+        <div class="divider-line"></div>
+
+        <div class="tc-title">Terms and Conditions</div>
+        <ul class="tc-list">
+          <li>1. Please press the redeem button at the service point as the code has a limited validity period (10 minutes).</li>
+          <li>2. After redeeming, present the displayed code to the store staff to claim your discount.</li>
+          <li>3. 1 promotion code is valid for 1 redemption.</li>
+          <li>4. Redemption is available from Sep 16, 2026, to Dec 31 2026.</li>
+          <li>5. The privilege of redemptions is limited.</li>
+          <li>6. This discount cannot be exchanged, transferred, or redeemed for cash under any circumstances.</li>
+          <li>7. The company reserves the right to modify or change the terms and conditions without prior notice.</li>
+          <li>8. The company reserves the right to cancel or refund accumulated points in any case after the points redemption is confirmed.</li>
+        </ul>
+
+        <div class="tc-title underlined">Terms and Conditions for Using the Store Discount</div>
+        <ul class="tc-list">
+          <li>1. No limit on the number of redemptions per receipt.</li>
+          <li>2. Please show the code at the store along with the mobile phone used to receive the code.</li>
+          <li>3. Refrain from taking screenshots or any fraudulent activities.</li>
+          <li>4. The privilege is available for all participating branches.</li>
+          <li>5. Cannot be exchanged for cash or used with other promotions.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Sticky Bottom Bar -->
+    <div class="bottom-bar">
+      <div class="points-row">
+        <span class="points-label">Points Balance:</span>
+        <div class="points-val-wrap">
+          <span class="coin-icon">↗</span>
+          <span class="points-num">0</span>
+        </div>
+      </div>
+      <button class="bottom-cta-btn">See my available Coupons</button>
+    </div>
+  </div>
+
+  <script>
+    // ระบบนับถอยหลังเริ่มต้นที่ 9999999 : 60 ตามที่ระบุ
+    let minutes = 9999999;
+    let seconds = 60;
+    const display = document.getElementById('countdownDisplay');
+
+    function updateTimerDisplay() {
+      const formattedSeconds = seconds < 10 ? '0' + seconds : seconds;
+      display.textContent = `${minutes} : ${formattedSeconds}`;
+    }
+
+    // แสดงค่าเริ่มต้นทันทีเมื่อเปิดเว็บ (9999999 : 60)
+    updateTimerDisplay();
+
+    setInterval(() => {
+      if (seconds > 0) {
+        seconds--;
+      } else {
+        if (minutes > 0) {
+          minutes--;
+          seconds = 59;
+        }
+      }
+      updateTimerDisplay();
+    }, 1000);
+
+    // ปุ่มคัดลอกรหัสคูปอง
+    const copyBtn = document.getElementById('copyBtn');
+    const voucherCode = document.getElementById('voucherCode');
+    const toast = document.getElementById('toast');
+
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(voucherCode.textContent.trim()).then(() => {
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+      });
+    });
+
+
+
+
+
+
+        // ฟังก์ชันสั่งเข้าโหมดเต็มจอ (Fullscreen API) เมื่อผู้ใช้แตะหน้าจอครั้งแรก
+    function enterFullScreen() {
+      const docEl = document.documentElement;
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (docEl.requestFullscreen) {
+          docEl.requestFullscreen().catch(() => {});
+        } else if (docEl.webkitRequestFullscreen) {
+          docEl.webkitRequestFullscreen();
+        }
+      }
+    }
+
+    // แตะตรงไหนก็ได้ครั้งแรกเพื่อเข้าโหมดเต็มจอทันที (หรือดับเบิ้ลคลิกเพื่อเข้า/ออก)
+    document.addEventListener('click', enterFullScreen, { once: true });
+
+
+
+  </script>
+</body>
+</html>
